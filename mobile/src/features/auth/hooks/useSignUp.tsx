@@ -24,6 +24,7 @@ export default function () {
     email: "",
     password: "",
   });
+  const [verificationCode, setVerificationCode] = useState("");
 
   const handleSignUp = async () => {
     if (
@@ -67,8 +68,51 @@ export default function () {
     }
   };
 
+  const handleVerifyEmail = async () => {
+    if (!signUp) return;
+    setLoading(true);
+
+    try {
+      const attemptVerification = await signUp.verifications.verifyEmailCode({
+        code: verificationCode,
+      });
+
+      if (signUp.status === "complete") {
+        console.log("User is now authenticated!");
+      }
+    } catch (error) {
+      console.error("email verification error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!signUp) return;
+    setLoading(true);
+    try {
+      await signUp.verifications.sendEmailCode();
+      console.log("New verification code sent!");
+    } catch (error) {
+      console.log("Failed to send verification code, Please try again.");
+      console.error("Resend code error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInput = (fieldName: string, value: unknown): void => {
     setCredentials((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
+  return {
+    credentials,
+    loading,
+    setCredentials,
+    handleSignUp,
+    setVerificationCode,
+    handleVerifyEmail,
+    handleResendCode,
+    handleInput,
   };
 }
