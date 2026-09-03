@@ -25,6 +25,8 @@ export default function () {
     password: "",
   });
   const [verificationCode, setVerificationCode] = useState("");
+  const [verificationStatus, setverificationStatus] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignUp = async () => {
     if (
@@ -54,11 +56,10 @@ export default function () {
           console.error("Verification error:", codeError);
           return;
         }
-        return;
       }
-      console.log(signUp.status);
+
       console.log("Verification code sent!");
-      // navigation.navigate("VerifyEmail" as never);
+      navigation.navigate("VerifyEmail" as never);
     } catch (error) {
       console.error("Sign up error:", error);
     } finally {
@@ -68,15 +69,19 @@ export default function () {
 
   const handleVerifyEmail = async () => {
     if (!signUp) return;
+    if (!verificationCode) return;
     setLoading(true);
 
     try {
       const attemptVerification = await signUp.verifications.verifyEmailCode({
         code: verificationCode,
       });
+      if (attemptVerification.error)
+        throw new Error(attemptVerification.error.message);
 
       if (signUp.status === "complete") {
         console.log("User is now authenticated!");
+        setverificationStatus(true);
       }
     } catch (error) {
       console.error("email verification error:", error);
@@ -106,6 +111,9 @@ export default function () {
   return {
     credentials,
     loading,
+    navigation,
+    verificationCode,
+    verificationStatus,
     setCredentials,
     handleSignUp,
     setVerificationCode,
