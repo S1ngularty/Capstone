@@ -6,7 +6,7 @@ interface UserCredentials {
   first_name: string;
   last_name: string;
   role: "user";
-  username: string;
+  username?: string;
   email: string;
   password: string;
 }
@@ -28,8 +28,8 @@ export default function () {
 
   const handleSignUp = async () => {
     if (
-      !credentials.first_name.trim() ||
-      !credentials.last_name.trim() ||
+      // !credentials.first_name.trim() ||
+      // !credentials.last_name.trim() ||
       !credentials.email ||
       !credentials.password
     ) {
@@ -43,9 +43,6 @@ export default function () {
 
     try {
       const { error } = await signUp.create({
-        firstName: credentials.first_name,
-        lastName: credentials.last_name,
-        username: credentials.username,
         emailAddress: credentials.email,
         password: credentials.password,
       });
@@ -54,11 +51,12 @@ export default function () {
         const { error: codeError } = await signUp.verifications.sendEmailCode();
 
         if (codeError) {
-          console.log("Failed to send verification code, Please try again.");
+          console.error("Verification error:", codeError);
+          return;
         }
         return;
       }
-
+      console.log(signUp.status);
       console.log("Verification code sent!");
       // navigation.navigate("VerifyEmail" as never);
     } catch (error) {
