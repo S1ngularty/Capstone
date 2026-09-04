@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSignUp } from "@clerk/expo";
 import { useNavigation } from "@react-navigation/native";
+import showToast from "../../../helper/toast";
 
 interface UserCredentials {
   first_name: string;
@@ -35,7 +36,7 @@ export default function () {
       !credentials.email ||
       !credentials.password
     ) {
-      console.log("Please fill out all required fields.");
+      showToast("error", "Sign up error", "Please fill out the fields first.");
       return;
     }
 
@@ -54,11 +55,17 @@ export default function () {
 
         if (codeError) {
           console.error("Verification error:", codeError);
+          showToast(
+            "error",
+            "Sign up verification",
+            "Failed to send a verification code, please try again.",
+          );
+
           return;
         }
       }
 
-      console.log("Verification code sent!");
+      showToast("success", "Sign up verification", "Verification code sent.");
       navigation.navigate("VerifyEmail" as never);
     } catch (error) {
       console.error("Sign up error:", error);

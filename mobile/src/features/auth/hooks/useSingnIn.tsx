@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useSignIn } from "@clerk/expo";
+import { isClerkAPIResponseError, useSignIn } from "@clerk/expo";
 import { useNavigation } from "@react-navigation/native";
+import showToast from "../../../helper/toast";
 
 interface SignInCredentials {
   email: string;
@@ -20,8 +21,14 @@ export default function SignInHook() {
 
   const handleSignIn = async (): Promise<void> => {
     try {
-      if (!credentials.email || !credentials.password)
-        throw new Error("Please fill out the fields.");
+      if (!credentials.email || !credentials.password) {
+        showToast(
+          "error",
+          "Sign up error",
+          "Please fill out the fields first.",
+        );
+        return;
+      }
 
       if (!signIn) return;
 
@@ -32,7 +39,9 @@ export default function SignInHook() {
         password: credentials.password,
       });
 
-      if (error) throw new Error(`failed to SignIn: ${error.message}`);
+      if (error) throw error;
+
+      console.log(signIn.status);
 
       if (signIn.status === "complete") {
         navigation.navigate("Home" as never);
@@ -40,7 +49,32 @@ export default function SignInHook() {
 
       return;
     } catch (error) {
-      console.error("SingIn Error:", error);
+      if (isClerkAPIResponseError(error)) {
+        if (
+          error?.code === "form_password_incorrect" ||
+          error?.code === "form_identifier_not_found"
+        ) {
+          showToast(
+            "error",
+            "Sign in Error",
+            "Invalid email or password. Please try again.",
+          );
+        } else {
+          showToast(
+            "error",
+            "Sign in Error",
+            "An error occured, please try again later",
+          );
+        }
+      } else {
+        console.log("Clerk sign up error:", error);
+        showToast(
+          "error",
+          "Sign in Error",
+          "A network error occurred. Please try again.",
+        );
+      }
+      console.error("Sign In Error:", error);
       return;
     } finally {
       setLoading(false);

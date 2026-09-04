@@ -54,14 +54,6 @@ const SignInScreen = () => {
   };
 
   const handleSignInPress = async () => {
-    if (!credentials.email || !credentials.password) {
-      Alert.alert(
-        "Missing Information",
-        "Please enter your email and password.",
-      );
-      return;
-    }
-
     await handleSignIn();
   };
 
