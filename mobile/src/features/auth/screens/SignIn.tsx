@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,12 @@ import {
   Platform,
   ActivityIndicator,
   Pressable,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
   FadeInDown,
   FadeInUp,
-  FadeOut,
   useAnimatedStyle,
   withTiming,
   useSharedValue,
@@ -24,17 +24,19 @@ import {
   Leaf,
   Mail,
   Lock,
-  User,
   ChevronRight,
-  Phone,
+  Globe,
+  Eye,
+  EyeOff,
 } from "lucide-react-native";
-import useSignUpHook from "../hooks/useSignUp";
+import SignInHook from "../hooks/useSingnIn";
 
-const SignUpScreen = () => {
-  const { credentials, loading, handleSignUp, handleInput, navigation } =
-    useSignUpHook();
+const SignInScreen = () => {
+  const { credentials, loading, error, handleInput, handleSignIn, navigation } =
+    SignInHook();
 
   const [language, setLanguage] = useState("en");
+  const [showPassword, setShowPassword] = useState(false);
   const buttonScale = useSharedValue(1);
 
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -51,11 +53,17 @@ const SignUpScreen = () => {
     buttonScale.value = withTiming(1, { duration: 100 });
   };
 
-  const socialButtons = [
-    { icon: "G", label: "Continue with Google", color: "#DB4437" },
-    { icon: "f", label: "Continue with Facebook", color: "#4267B2" },
-    { icon: "📱", label: "Continue with Device", color: "#333333" },
-  ];
+  const handleSignInPress = async () => {
+    if (!credentials.email || !credentials.password) {
+      Alert.alert(
+        "Missing Information",
+        "Please enter your email and password.",
+      );
+      return;
+    }
+
+    await handleSignIn();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,8 +84,8 @@ const SignUpScreen = () => {
             <View style={styles.logoContainer}>
               <Leaf size={32} color="#4CAF50" strokeWidth={1.5} />
             </View>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Grow with us</Text>
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Sign in to continue</Text>
           </Animated.View>
 
           {/* Form */}
@@ -94,13 +102,14 @@ const SignUpScreen = () => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder="Email Address"
                 placeholderTextColor="#999"
                 value={credentials.email}
                 onChangeText={(value) => handleInput("email", value)}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
+                autoCorrect={false}
               />
             </View>
 
@@ -117,34 +126,63 @@ const SignUpScreen = () => {
                 placeholderTextColor="#999"
                 value={credentials.password}
                 onChangeText={(value) => handleInput("password", value)}
-                secureTextEntry
-                autoComplete="password-new"
+                secureTextEntry={!showPassword}
+                autoComplete="password"
+                autoCapitalize="none"
               />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+              >
+                {showPassword ? (
+                  <EyeOff size={20} color="#666" strokeWidth={1.5} />
+                ) : (
+                  <Eye size={20} color="#666" strokeWidth={1.5} />
+                )}
+              </TouchableOpacity>
             </View>
+
+            {/* Error Message */}
+            {error && (
+              <Animated.View
+                entering={FadeInDown.duration(300)}
+                style={styles.errorContainer}
+              >
+                <Text style={styles.errorText}>{error}</Text>
+              </Animated.View>
+            )}
 
             <Animated.View style={animatedButtonStyle}>
               <Pressable
-                onPress={handleSignUp}
+                onPress={handleSignInPress}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 disabled={loading}
-                style={[styles.signUpButton, loading && styles.buttonDisabled]}
+                style={[styles.signInButton, loading && styles.buttonDisabled]}
               >
                 {loading ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <>
-                    <Text style={styles.signUpButtonText}>Create Account</Text>
+                    <Text style={styles.signInButtonText}>Sign In</Text>
                     <ChevronRight size={20} color="#fff" strokeWidth={2} />
                   </>
                 )}
               </Pressable>
             </Animated.View>
 
+            {/* Forgot Password */}
+            <TouchableOpacity
+              style={styles.forgotPasswordButton}
+              onPress={() => console.log("Navigate to Forgot Password")}
+            >
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+
             {/* Divider */}
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
+              <Text style={styles.dividerText}>or continue with</Text>
               <View style={styles.dividerLine} />
             </View>
 
@@ -153,12 +191,22 @@ const SignUpScreen = () => {
               <TouchableOpacity
                 style={styles.socialButton}
                 activeOpacity={0.8}
-                onPress={() => console.log("Google Sign Up")}
+                onPress={() =>
+                  Alert.alert(
+                    "Google Sign In",
+                    "Google authentication coming soon",
+                  )
+                }
               >
                 <View style={styles.socialButtonContent}>
-                  <Text style={[styles.socialIcon, { color: "#DB4437" }]}>
-                    G
-                  </Text>
+                  <View
+                    style={[
+                      styles.socialIconContainer,
+                      { backgroundColor: "#DB4437" },
+                    ]}
+                  >
+                    <Text style={styles.socialIconText}>G</Text>
+                  </View>
                   <Text style={styles.socialButtonText}>
                     Continue with Google
                   </Text>
@@ -168,12 +216,22 @@ const SignUpScreen = () => {
               <TouchableOpacity
                 style={styles.socialButton}
                 activeOpacity={0.8}
-                onPress={() => console.log("Facebook Sign Up")}
+                onPress={() =>
+                  Alert.alert(
+                    "Facebook Sign In",
+                    "Facebook authentication coming soon",
+                  )
+                }
               >
                 <View style={styles.socialButtonContent}>
-                  <Text style={[styles.socialIcon, { color: "#4267B2" }]}>
-                    f
-                  </Text>
+                  <View
+                    style={[
+                      styles.socialIconContainer,
+                      { backgroundColor: "#4267B2" },
+                    ]}
+                  >
+                    <Text style={styles.socialIconText}>f</Text>
+                  </View>
                   <Text style={styles.socialButtonText}>
                     Continue with Facebook
                   </Text>
@@ -183,10 +241,22 @@ const SignUpScreen = () => {
               <TouchableOpacity
                 style={styles.socialButton}
                 activeOpacity={0.8}
-                onPress={() => console.log("Device Sign Up")}
+                onPress={() =>
+                  Alert.alert(
+                    "Device Sign In",
+                    "Device authentication coming soon",
+                  )
+                }
               >
                 <View style={styles.socialButtonContent}>
-                  <Phone size={24} color="#333" strokeWidth={1.5} />
+                  <View
+                    style={[
+                      styles.socialIconContainer,
+                      { backgroundColor: "#333333" },
+                    ]}
+                  >
+                    <Globe size={20} color="#fff" strokeWidth={1.5} />
+                  </View>
                   <Text style={styles.socialButtonText}>
                     Continue with Device
                   </Text>
@@ -194,13 +264,13 @@ const SignUpScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Sign In Link */}
-            <View style={styles.signInContainer}>
-              <Text style={styles.signInText}>Already have an account?</Text>
+            {/* Sign Up Link */}
+            <View style={styles.signUpContainer}>
+              <Text style={styles.signUpText}>Don't have an account?</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("SignIn" as never)}
+                onPress={() => navigation.navigate("SignUp" as never)}
               >
-                <Text style={styles.signInLink}>Sign In</Text>
+                <Text style={styles.signUpLink}> Sign Up</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -223,7 +293,7 @@ const SignUpScreen = () => {
                   language === "en" && styles.languageTextActive,
                 ]}
               >
-                EN
+                English
               </Text>
             </TouchableOpacity>
             <View style={styles.languageDivider} />
@@ -240,7 +310,7 @@ const SignUpScreen = () => {
                   language === "fil" && styles.languageTextActive,
                 ]}
               >
-                FIL
+                Filipino
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -308,7 +378,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  signUpButton: {
+  eyeButton: {
+    padding: 8,
+  },
+  errorContainer: {
+    backgroundColor: "#FFF5F5",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#FFCDD2",
+  },
+  errorText: {
+    color: "#EF5350",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  signInButton: {
     backgroundColor: "#4CAF50",
     borderRadius: 12,
     paddingVertical: 16,
@@ -321,11 +407,21 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.7,
   },
-  signUpButtonText: {
+  signInButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
     marginRight: 8,
+  },
+  forgotPasswordButton: {
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  forgotPasswordText: {
+    color: "#4CAF50",
+    fontSize: 14,
+    fontWeight: "500",
   },
   divider: {
     flexDirection: "row",
@@ -357,36 +453,39 @@ const styles = StyleSheet.create({
   socialButtonContent: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
   },
-  socialIcon: {
-    fontSize: 20,
+  socialIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  socialIconText: {
+    fontSize: 16,
     fontWeight: "600",
-    marginRight: 1,
-    width: 24,
-    textAlign: "center",
+    color: "#fff",
   },
   socialButtonText: {
     fontSize: 15,
     color: "#333",
     fontWeight: "500",
   },
-  signInContainer: {
+  signUpContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 24,
   },
-  signInText: {
+  signUpText: {
     color: "#666",
     fontSize: 14,
   },
-  signInLink: {
+  signUpLink: {
     color: "#4CAF50",
     fontSize: 14,
     fontWeight: "600",
-    marginLeft: 4,
   },
   languageContainer: {
     flexDirection: "row",
@@ -395,7 +494,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   languageButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
@@ -419,4 +518,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default SignInScreen;
