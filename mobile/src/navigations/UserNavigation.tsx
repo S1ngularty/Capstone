@@ -17,7 +17,13 @@ export default function UserNavigation() {
   return (
     <UserStack.Navigator screenOptions={{ headerShown: false }}>
       <UserStack.Screen component={HomeTabNavigator} name="HomeTabs" />
-      <UserStack.Screen component={VideoScanningScreen} name="VideoScanning" />
+      <UserStack.Screen
+        component={VideoScanningScreen}
+        name="VideoScanning"
+        options={{
+          animation: "slide_from_left", // Optional: nice animation for scanner
+        }}
+      />
       <UserStack.Screen component={VideoPreviewScreen} name="VideoPreview" />
     </UserStack.Navigator>
   );
