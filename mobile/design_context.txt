@@ -1,0 +1,56 @@
+### Animation and Interaction
+
+Use subtle, purposeful animations to improve the user experience and make transitions between states feel natural.
+
+Animations should be quick, smooth, and unobtrusive. They should communicate changes in state rather than exist purely for decoration.
+
+Preferred animations include:
+
+* Fade-in and fade-out for content appearing or disappearing
+* Slide-in and slide-out for screens, panels, and result sections
+* Gentle scale or opacity transitions for buttons and interactive elements
+* Smooth loading and processing states during video diagnosis
+* Subtle feedback when an action is completed
+* Animated transitions when diagnosis results become available
+* Small progress or status animations while a video is being processed
+
+Avoid:
+
+* Excessive bouncing
+* Large or dramatic transitions
+* Constantly moving UI elements
+* Long animations that delay interaction
+* Flashing or attention-grabbing effects
+* Animation used purely as decoration
+
+Animations should generally feel fast and natural, with interaction remaining responsive throughout.
+
+### Design Libraries and Packages
+
+Use established and well-maintained libraries when they provide a clear benefit to the interface. Do not unnecessarily implement complex UI behavior from scratch.
+
+For animations and transitions, prefer modern React Native animation solutions such as:
+
+* React Native Reanimated for smooth native animations and transitions
+* React Native Gesture Handler when gesture-based interactions are needed
+* React Native's built-in Animated API for simple animations when an additional dependency is unnecessary
+
+For icons and interface symbols, use a consistent icon library such as:
+
+* Lucide React Native
+* React Native Vector Icons
+* Another established icon library that provides clean, minimal line icons
+
+For navigation and screen transitions, use the existing navigation solution provided by the application's framework rather than creating custom navigation behavior unnecessarily.
+
+For reusable UI components, prefer lightweight, well-maintained component libraries when they improve consistency, accessibility, or development speed. Avoid adding packages solely for visual decoration.
+
+### Animation Philosophy
+
+The application should feel responsive and polished without making the user notice the animations themselves.
+
+The goal is:
+
+**Simple → Responsive → Natural → Professional**
+
+Animations should support the agricultural diagnosis workflow rather than compete with the information being presented.
