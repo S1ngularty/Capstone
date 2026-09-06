@@ -22,9 +22,12 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 //Screens
-import HomeScreen from "../features/home/screen/Home";
+import HomeScreen from "../features/home/screens/Home";
+import { UserStackParamList } from "./UserNavigation"; // Import your stack param list
 
 // Define types for navigation
 type TabParamList = {
@@ -109,6 +112,30 @@ const PlaceholderScreen: React.FC<PlaceholderScreenProps> = ({ route }) => {
   );
 };
 
+// Special Scan placeholder that navigates to VideoScanning
+const ScanPlaceholderScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<UserStackParamList>>();
+  
+  return (
+    <View style={styles.placeholderContainer}>
+      <View style={styles.placeholderIconContainer}>
+        <ScanLine size={48} color="#4CAF50" strokeWidth={1.5} />
+      </View>
+      <Text style={styles.placeholderTitle}>Scan</Text>
+      <Text style={styles.placeholderSubtitle}>
+        Scan your crops for health analysis
+      </Text>
+      <TouchableOpacity
+        style={styles.scanActionButton}
+        onPress={() => navigation.navigate("VideoScanning")}
+      >
+        <ScanLine size={20} color="#fff" strokeWidth={2} />
+        <Text style={styles.scanActionButtonText}>Start Scanning</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const Tab = createBottomTabNavigator<TabParamList>();
 
 const AnimatedIcon: React.FC<AnimatedIconProps> = ({ focused, children }) => {
@@ -156,6 +183,8 @@ const CustomTabIcon: React.FC<CustomTabIconProps> = ({
 };
 
 const HomeTabNavigator: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<UserStackParamList>>();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -186,21 +215,26 @@ const HomeTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Scan"
-        component={PlaceholderScreen}
+        component={ScanPlaceholderScreen}
         options={{
           tabBarLabel: "Scan",
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused}>
               <View
-                style={[
-                  styles.scanButton,
-                  focused && styles.scanButtonFocused,
-                ]}
+                style={[styles.scanButton, focused && styles.scanButtonFocused]}
               >
                 <ScanLine size={28} color="#fff" strokeWidth={2} />
               </View>
             </AnimatedIcon>
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            // Prevent default tab navigation
+            e.preventDefault();
+            // Navigate to stack screen instead
+            navigation.navigate("VideoScanning");
+          },
         }}
       />
       <Tab.Screen
@@ -228,6 +262,8 @@ interface Styles {
   placeholderSubtitle: TextStyle;
   placeholderBadge: ViewStyle;
   placeholderBadgeText: TextStyle;
+  scanActionButton: ViewStyle;
+  scanActionButtonText: TextStyle;
 }
 
 const styles = StyleSheet.create<Styles>({
@@ -313,6 +349,20 @@ const styles = StyleSheet.create<Styles>({
     color: "#FF9800",
     fontSize: 14,
     fontWeight: "500",
+  },
+  scanActionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 25,
+    gap: 8,
+  },
+  scanActionButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 
