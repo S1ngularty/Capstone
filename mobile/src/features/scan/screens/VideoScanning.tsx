@@ -27,10 +27,11 @@ import {
   Camera as CameraIcon,
   SwitchCamera,
   SwitchCameraIcon,
-  LucideSwitchCamera
+  LucideSwitchCamera,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import showToast from "../../../helper/toast";
+import { NavigationProp } from "../types/navigationTypes";
 
 const MAX_DURATION = 15; // seconds
 const { width, height } = Dimensions.get("window");
@@ -42,7 +43,7 @@ const VideoScanningScreen = () => {
   const [cameraType, setCameraType] = useState<"back" | "front">("back");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const cameraRef = useRef<CameraView | null>(null);
   const recordingTimerRef = useRef<number | null>(null);
@@ -99,7 +100,7 @@ const VideoScanningScreen = () => {
           // Handle recorded video
           console.log("Video recorded:", video.uri);
           showToast("success", "", "Video recorded successfully!");
-          // navigation.navigate("VideoPreview", { videoUri: video.uri });
+          navigation.navigate("VideoPreview", { videoUri: video.uri });
         }
       } catch (error) {
         console.error("Recording error:", error);

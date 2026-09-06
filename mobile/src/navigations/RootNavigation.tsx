@@ -5,14 +5,14 @@ import AuthNavigator from "./AuthStackNavigation";
 import { useAuth } from "@clerk/expo";
 import UserNavigation from "./UserNavigation";
 
-const RootStack = createNativeStackNavigator();
-
 export type RootStackParamList = {
   Auth: undefined;
-  Home: undefined;
+  User: undefined;
 };
 
-export default function RootNavigator<RootStackParamList>() {
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+
+export default function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) {
@@ -25,7 +25,7 @@ export default function RootNavigator<RootStackParamList>() {
         {isSignedIn ? (
           <RootStack.Screen component={AuthNavigator} name="Auth" />
         ) : (
-          <RootStack.Screen component={UserNavigation} name="user" />
+          <RootStack.Screen component={UserNavigation} name="User" />
         )}
       </RootStack.Navigator>
     </NavigationContainer>

@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-
     "ios": {
       "supportsTablet": true
     },
@@ -24,7 +23,9 @@
       "@clerk/expo",
       "expo-secure-store",
       "expo-status-bar",
-      "expo-camera"
+      "expo-camera",
+      "expo-video",
+      "expo-audio"
     ]
   }
 }
