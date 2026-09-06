@@ -24,7 +24,13 @@ export default function UserNavigation() {
           animation: "slide_from_left", // Optional: nice animation for scanner
         }}
       />
-      <UserStack.Screen component={VideoPreviewScreen} name="VideoPreview" />
+      <UserStack.Screen
+        component={VideoPreviewScreen}
+        name="VideoPreview"
+        options={{
+          animation: "slide_from_left", // Optional: nice animation for scanner
+        }}
+      />
     </UserStack.Navigator>
   );
 }

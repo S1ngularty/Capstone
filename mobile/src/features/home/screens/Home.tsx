@@ -9,10 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import {
   Leaf,
   ScanLine,
@@ -39,6 +36,7 @@ import {
   Droplets,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -73,6 +71,7 @@ interface UploadQueue {
 const HomeScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
+  const navigation = useNavigation();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -269,7 +268,11 @@ const HomeScreen: React.FC = () => {
           entering={FadeInUp.delay(200).duration(600)}
           style={styles.scanSection}
         >
-          <TouchableOpacity style={styles.scanButton} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.scanButton}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate("VideoScanning" as never)}
+          >
             <View style={styles.scanIconContainer}>
               <ScanLine size={28} color="#4CAF50" strokeWidth={2} />
             </View>
@@ -384,9 +387,7 @@ const HomeScreen: React.FC = () => {
           <View style={styles.sectionHeader}>
             <View>
               <Text style={styles.sectionTitle}>Upload Queue</Text>
-              <Text style={styles.sectionSubtitle}>
-                Videos pending upload
-              </Text>
+              <Text style={styles.sectionSubtitle}>Videos pending upload</Text>
             </View>
             <View style={styles.queueBadge}>
               <Text style={styles.queueBadgeText}>{uploadQueue.length}</Text>
