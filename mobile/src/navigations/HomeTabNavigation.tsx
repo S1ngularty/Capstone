@@ -24,7 +24,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 //Screens
-import HomeScreen from "../features/home/screen/Home";
+import HomeScreen from "../features/home/screens/Home";
+import VideoScanningScreen from "../features/scan/screens/VideoScanning";
 
 // Define types for navigation
 type TabParamList = {
@@ -186,16 +187,13 @@ const HomeTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Scan"
-        component={PlaceholderScreen}
+        component={VideoScanningScreen}
         options={{
           tabBarLabel: "Scan",
           tabBarIcon: ({ focused }) => (
             <AnimatedIcon focused={focused}>
               <View
-                style={[
-                  styles.scanButton,
-                  focused && styles.scanButtonFocused,
-                ]}
+                style={[styles.scanButton, focused && styles.scanButtonFocused]}
               >
                 <ScanLine size={28} color="#fff" strokeWidth={2} />
               </View>
