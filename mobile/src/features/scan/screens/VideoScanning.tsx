@@ -19,6 +19,7 @@ import {
   LucideSwitchCamera,
 } from "lucide-react-native";
 import useScanning from "../hooks/useScanning";
+import { formatTime } from "../../../utils/formatTime";
 
 const MAX_DURATION = 15; // seconds
 const { width, height } = Dimensions.get("window");
@@ -37,7 +38,6 @@ const VideoScanningScreen = () => {
 
     startRecording,
     stopRecording,
-    formatTime,
     toggleCameraType,
     toggleMute,
   } = useScanning();
