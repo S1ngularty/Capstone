@@ -25,5 +25,7 @@ export async function createVideoUpload(
     });
 
     wrapResponse("OK", 200, res, result);
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 }
