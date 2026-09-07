@@ -6,7 +6,7 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { env } from "../../configs/env.config.js";
+import { env } from "../../core/configs/env.config.js";
 
 class R2Client {
   private readonly client: S3Client;
