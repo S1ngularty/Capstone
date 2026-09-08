@@ -1,16 +1,14 @@
-import mongoose, { Schema, Document, Model, model } from "mongoose";
-import type { HydratedDocument } from "mongoose";
-import type { IUser } from "./user.types.js";
+import mongoose, { Schema, type HydratedDocument, type Model } from "mongoose";
+import type { IUser, UserRole } from "./user.types.js";
 
-type UserModel = Model<IUser>;
-
-const userSchema = new Schema<IUser, UserModel>(
+const userSchema = new Schema<IUser>(
   {
     clerkId: {
       type: String,
       required: true,
       unique: true,
       index: true,
+      trim: true,
     },
     name: {
       type: String,
@@ -19,41 +17,63 @@ const userSchema = new Schema<IUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ["farmer", "admin"],
-      default: "farmer",
+      enum: ["user", "admin"] as UserRole[],
+      default: "user",
+      index: true,
     },
     phoneNumber: {
       type: String,
       sparse: true,
+      trim: true,
     },
     farmLocation: {
-      province: String,
-      municipality: String,
-      barangay: String,
+      province: {
+        type: String,
+        trim: true,
+      },
+      municipality: {
+        type: String,
+        trim: true,
+      },
+      barangay: {
+        type: String,
+        trim: true,
+      },
     },
     preferredCrops: [
       {
         type: String,
-        enum: ["tomato", "eggplant", "pepper", "potato"],
+        enum: ["tomato", "eggplant", "pepper", "potato", ],
       },
     ],
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
-    lastLoginAt: Date,
+    lastLoginAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
     collection: "users",
+    versionKey: false,
   },
 );
 
+// Compound indexes for common query patterns
+userSchema.index({ clerkId: 1, isActive: 1 });
+userSchema.index({ role: 1, isActive: 1 });
+userSchema.index({
+  "farmLocation.province": 1,
+  "farmLocation.municipality": 1,
+});
+userSchema.index({ preferredCrops: 1 });
+
 export type UserDocument = HydratedDocument<IUser>;
 
-// Indexes for common queries
-userSchema.index({ email: 1 });
-userSchema.index({ role: 1 });
-userSchema.index({ "farmLocation.province": 1 });
-
-export const UserModel = mongoose.model<IUser>("User", userSchema);
+export const UserModel: Model<IUser> = mongoose.model<IUser>(
+  "User",
+  userSchema,
+);
