@@ -12,9 +12,7 @@ export async function createVideoUpload(
   next: NextFunction,
 ) {
   try {
-    const userId = req.user?.userId;
-
-    if (!userId) throw new Error("missing userId");
+    const { userId } = req.auth;
 
     const { fileName, contentType, fileSize } = req.body;
 
