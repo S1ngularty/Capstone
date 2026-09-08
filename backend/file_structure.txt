@@ -1,0 +1,73 @@
+express-backend/
+├── src/
+│   ├── app.ts
+│   ├── server.ts
+│   │
+│   ├── config/
+│   │   ├── env.ts
+│   │   ├── database.ts
+│   │   ├── clerk.ts
+│   │   └── storage.ts
+│   │
+│   ├── modules/
+│   │   │
+│   │   ├── auth/
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   └── auth.types.ts
+│   │   │
+│   │   ├── users/
+│   │   │   ├── user.controller.ts
+│   │   │   ├── user.service.ts
+│   │   │   ├── user.repository.ts
+│   │   │   ├── user.routes.ts
+│   │   │   └── user.types.ts
+│   │   │
+│   │   ├── videos/
+│   │   │   ├── video.controller.ts
+│   │   │   ├── video.service.ts
+│   │   │   ├── video.repository.ts
+│   │   │   ├── video.routes.ts
+│   │   │   └── video.types.ts
+│   │   │
+│   │   ├── diagnoses/
+│   │   │   ├── diagnosis.controller.ts
+│   │   │   ├── diagnosis.service.ts
+│   │   │   ├── diagnosis.repository.ts
+│   │   │   ├── diagnosis.routes.ts
+│   │   │   └── diagnosis.types.ts
+│   │   │
+│   │   └── recommendations/
+│   │       ├── recommendation.controller.ts
+│   │       ├── recommendation.service.ts
+│   │       ├── recommendation.repository.ts
+│   │       ├── recommendation.routes.ts
+│   │       └── recommendation.types.ts
+│   │
+│   ├── integrations/
+│   │   ├── clerk/
+│   │   │   └── clerk.client.ts
+│   │   ├── storage/
+│   │   │   └── r2.client.ts
+│   │   └── ai/
+│   │       └── fastapi.client.ts
+│   │
+│   ├── middleware/
+│   │   ├── auth.middleware.ts
+│   │   ├── error.middleware.ts
+│   │   └── validation.middleware.ts
+│   │
+│   ├── shared/
+│   │   ├── errors/
+│   │   ├── utils/
+│   │   └── types/
+│   │
+│   └── jobs/
+│       ├── video-processing.job.ts
+│       └── workers/
+│           └── video-processing.worker.ts
+│
+├── tests/
+├── package.json
+└── tsconfig.json
