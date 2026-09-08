@@ -2,10 +2,14 @@ import dotenv from "dotenv";
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const { default: app } = await import("./app.js");
+const { default: connectDB } =
+  await import("./core/configs/mongoose.config.js");
 import http from "http";
 import path from "path";
 
 const server = http.createServer(app);
+
+connectDB();
 
 const port = Number(process.env.PORT) || 3000;
 

@@ -13,4 +13,8 @@ export const env = {
     secretAccessKey: requiredEnv("R2_SECRET_ACCESS_KEY"),
     bucketName: requiredEnv("R2_BUCKET_NAME"),
   },
+
+  mongoose: {
+    db_uri: requiredEnv("DB_URI"),
+  },
 };
