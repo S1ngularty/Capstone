@@ -1,5 +1,5 @@
 export interface CreateUploadReturn {
-  videoId: `${string}-${string}-${string}-${string}-${string}`;
+  videoId: string;
   storageKey: string;
   uploadUrl: string;
   expiresIn: number;

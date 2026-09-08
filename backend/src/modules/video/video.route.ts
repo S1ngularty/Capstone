@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { getAuth } from "@clerk/express";
 
 import { createVideoUpload } from "./video.controller.js";
 import { requireSession } from "../../middleware/auth.middleware.js";
