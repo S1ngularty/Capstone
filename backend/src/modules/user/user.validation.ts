@@ -1,0 +1,41 @@
+import { z } from "zod";
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(100).optional(),
+  phoneNumber: z.string().regex(/^[0-9+\-\s()]+$/, "Invalid phone number format").optional(),
+  farmLocation: z.object({
+    province: z.string().min(1).max(100).optional(),
+    municipality: z.string().min(1).max(100).optional(),
+    barangay: z.string().min(1).max(100).optional(),
+  }).optional(),
+});
+
+export const updatePreferredCropsSchema = z.object({
+  preferredCrops: z.array(
+    z.enum(["tomato", "eggplant", "pepper", "crop_4", "crop_5", "crop_6"])
+  ).min(1, "At least one crop required").max(6, "Maximum 6 crops allowed"),
+});
+
+export const updateRoleSchema = z.object({
+  role: z.enum(["user", "admin"]),
+});
+
+export const userIdParamSchema = z.object({
+  userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid user ID"),
+});
+
+export const getUsersQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(10),
+  sortBy: z.enum(["createdAt", "updatedAt", "name", "email"]).default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  role: z.enum(["user", "admin"]).optional(),
+  isActive: z.enum(["true", "false"]).transform(val => val === "true").optional(),
+  province: z.string().optional(),
+  municipality: z.string().optional(),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdatePreferredCropsInput = z.infer<typeof updatePreferredCropsSchema>;
+export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
+export type GetUsersQuery = z.infer<typeof getUsersQuerySchema>;

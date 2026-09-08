@@ -11,5 +11,5 @@ export const wrapResponse = <T>(
     message: message,
     success: status < 400,
     result: data,
-  });
+  }); 
 };

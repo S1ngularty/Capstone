@@ -38,27 +38,29 @@ export interface ICreateUser {
 }
 
 export interface IUpdateUser {
-  name?: string;
+  name?: string | undefined;
   role?: UserRole;
-  phoneNumber?: string;
-  farmLocation?: {
-    province?: string;
-    municipality?: string;
-    barangay?: string;
-  };
+  phoneNumber?: string | undefined;
+  farmLocation?:
+    | {
+        province?: string | undefined;
+        municipality?: string | undefined;
+        barangay?: string | undefined;
+      }
+    | undefined;
   preferredCrops?: string[];
   isActive?: boolean;
   lastLoginAt?: Date;
 }
 
 export interface IUserFilter {
-  clerkId?: string;
-  email?: string;
-  role?: UserRole;
-  isActive?: boolean;
-  province?: string;
-  municipality?: string;
-  preferredCrops?: string[];
+  clerkId?: string | undefined;
+  email?: string | undefined;
+  role?: UserRole | undefined;
+  isActive?: boolean | undefined;
+  province?: string | undefined;
+  municipality?: string | undefined;
+  preferredCrops?: string[] | undefined;
 }
 
 export interface IUserProjection {
