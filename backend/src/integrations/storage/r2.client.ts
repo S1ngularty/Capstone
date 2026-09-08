@@ -18,6 +18,8 @@ class R2Client {
     this.client = new S3Client({
       region: "auto",
 
+      endpoint: env.r2.s3Api,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: env.r2.accessKeyId,
         secretAccessKey: env.r2.secretAccessKey,
