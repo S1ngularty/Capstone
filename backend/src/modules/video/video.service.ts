@@ -11,8 +11,14 @@ export class VideoService {
 
     const videoId = randomUUID();
 
-    const storageKey = `videos/${userId}/${videoId}/original.mp4`;
+    const extension =
+      input.contentType === "video/mp4"
+        ? "mp4"
+        : input.contentType === "video/webm"
+          ? "webm"
+          : "mov";
 
+    const storageKey = `videos/${userId}/${videoId}/original.${extension}`;
     const uploadUrl = await r2Client.createUploadUrl(
       storageKey,
       input.contentType,
