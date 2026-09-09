@@ -5,6 +5,6 @@ import { requireSession } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.route("/video/upload").post(requireSession, createVideoUpload);
+router.route("/upload").post(requireSession, createVideoUpload);
 
 export default router;

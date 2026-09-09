@@ -5,7 +5,7 @@ export type UserRole = "user" | "admin";
 export interface IUser extends Document {
   _id: Types.ObjectId;
   clerkId: string;
-  email: string;
+  email?: string;
   name: string;
   role: UserRole;
   phoneNumber?: string;

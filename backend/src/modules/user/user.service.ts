@@ -23,7 +23,10 @@ export class UserService {
       email: payload.email.toLowerCase(),
     };
 
-    const result = await UserRepository.findOrCreateByClerkId(clerkId, normalizedPayload);
+    const result = await UserRepository.findOrCreateByClerkId(
+      clerkId,
+      normalizedPayload,
+    );
 
     // If user exists, update last login
     if (!result.created) {
@@ -63,14 +66,15 @@ export class UserService {
   ): Promise<IUser | null> {
     // Prevent updating clerkId and email through this method
     const { name, role, phoneNumber, farmLocation, preferredCrops } = updates;
-    
+
     const safeUpdates: Partial<IUpdateUser> = {};
-    
+
     if (name !== undefined) safeUpdates.name = name;
     if (role !== undefined) safeUpdates.role = role;
     if (phoneNumber !== undefined) safeUpdates.phoneNumber = phoneNumber;
     if (farmLocation !== undefined) safeUpdates.farmLocation = farmLocation;
-    if (preferredCrops !== undefined) safeUpdates.preferredCrops = preferredCrops;
+    if (preferredCrops !== undefined)
+      safeUpdates.preferredCrops = preferredCrops;
 
     return UserRepository.updateByClerkId(clerkId, safeUpdates);
   }
@@ -98,9 +102,16 @@ export class UserService {
     crops: string[],
   ): Promise<IUser | null> {
     // Validate crops
-    const validCrops = ["tomato", "eggplant", "pepper", "crop_4", "crop_5", "crop_6"];
-    const invalidCrops = crops.filter(crop => !validCrops.includes(crop));
-    
+    const validCrops = [
+      "tomato",
+      "eggplant",
+      "pepper",
+      "crop_4",
+      "crop_5",
+      "crop_6",
+    ];
+    const invalidCrops = crops.filter((crop) => !validCrops.includes(crop));
+
     if (invalidCrops.length > 0) {
       throw new Error(`Invalid crops: ${invalidCrops.join(", ")}`);
     }
@@ -116,7 +127,7 @@ export class UserService {
    */
   static async deactivateUser(clerkId: string): Promise<IUser | null> {
     const user = await UserRepository.findByClerkId(clerkId);
-    
+
     if (!user) {
       throw new Error("User not found");
     }
@@ -133,7 +144,7 @@ export class UserService {
    */
   static async reactivateUser(clerkId: string): Promise<IUser | null> {
     const user = await UserRepository.findByClerkId(clerkId);
-    
+
     if (!user) {
       throw new Error("User not found");
     }
@@ -150,7 +161,7 @@ export class UserService {
    */
   static async deleteUser(clerkId: string): Promise<boolean> {
     const user = await UserRepository.findByClerkId(clerkId);
-    
+
     if (!user) {
       throw new Error("User not found");
     }
@@ -224,7 +235,7 @@ export class UserService {
     activeUsers: number;
   }> {
     const [allUsers, admins, activeUsers] = await Promise.all([
-      UserRepository.getUsersList({ limit: 1, filter: { isActive: true } }),
+      UserRepository.getUsersList({ limit: 1 }),
       UserRepository.countByRole("admin"),
       UserRepository.getUsersList({ limit: 1, filter: { isActive: true } }),
     ]);

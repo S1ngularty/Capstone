@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(clerkMiddleware());
 
-app.use(router);
+app.use("/api/v1", router);
 
 app.get("/ping", async (req, res): Promise<void> => {
   res.send("SIPAT server is alive!");
