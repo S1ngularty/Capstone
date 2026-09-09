@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { UserController } from "./user.controller.js";
-import { requireSession } from "../../middleware/auth.middleware.js";
+import { AuthMiddleware } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
 // All user routes require authentication
-router.use(requireSession);
+router.use(AuthMiddleware.requireSession);
 
 // Current user routes (authenticated user's own profile)
 router.get("/me", UserController.getCurrentUser);

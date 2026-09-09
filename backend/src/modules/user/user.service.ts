@@ -102,14 +102,7 @@ export class UserService {
     crops: string[],
   ): Promise<IUser | null> {
     // Validate crops
-    const validCrops = [
-      "tomato",
-      "eggplant",
-      "pepper",
-      "crop_4",
-      "crop_5",
-      "crop_6",
-    ];
+    const validCrops = ["tomato", "eggplant", "pepper", "potato"];
     const invalidCrops = crops.filter((crop) => !validCrops.includes(crop));
 
     if (invalidCrops.length > 0) {
