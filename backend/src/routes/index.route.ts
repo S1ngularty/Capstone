@@ -1,5 +1,17 @@
-import video from "../modules/video/video.route.js";
+import videoRoutes from "../modules/video/video.route.js";
+import userRoutes from "../modules/user/user.route.js";
+import { Router } from "express";
 
-export default {
-  video,
-};
+const router = Router();
+
+router.get("/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+router.use("/users", userRoutes);
+router.use("/videos", videoRoutes);
+
+export default router;
