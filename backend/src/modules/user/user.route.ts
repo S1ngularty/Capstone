@@ -13,7 +13,7 @@ router.patch("/me", UserController.updateCurrentUser);
 router.put("/me/preferred-crops", UserController.updatePreferredCrops);
 
 // Admin-only routes
-// router.use(requireSession);
+router.use(AuthMiddleware.requireRole("admin"));
 
 // User management routes (admin only)
 router.get("/stats/overview", UserController.getUserStats);
