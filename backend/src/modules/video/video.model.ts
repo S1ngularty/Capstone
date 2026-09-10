@@ -5,8 +5,9 @@ import {
   type InferSchemaType,
   type Model,
 } from "mongoose";
+import type { Video } from "./video.types.js";
 
-const videoSchema = new Schema(
+const videoSchema = new Schema<Video>(
   {
     userId: {
       type: String,
