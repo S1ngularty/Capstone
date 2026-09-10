@@ -18,7 +18,7 @@ export class VideoService {
           ? "webm"
           : "mov";
 
-    const storageKey = `videos/${userId}/${videoId}/original.${extension}`;
+    const storageKey = `videos/${userId}/${videoId}/${input.fileName}.${extension}`;
     const uploadUrl = await r2Client.createUploadUrl(
       storageKey,
       input.contentType,

@@ -6,7 +6,7 @@ import { AuthMiddleware } from "../../middleware/auth.middleware.js";
 const router = Router();
 
 router.use(AuthMiddleware.requireSession);
-router.use(AuthMiddleware.requireRole("user"));
+// router.use(AuthMiddleware.requireRole("user"));
 
 router.route("/upload").post(createVideoUpload);
 

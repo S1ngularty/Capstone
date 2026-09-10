@@ -88,6 +88,7 @@ export default function () {
 
       if (signUp.status === "complete") {
         console.log("User is now authenticated!");
+        signUp.finalize();
         setverificationStatus(true);
       }
     } catch (error) {

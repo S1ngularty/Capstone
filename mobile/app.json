@@ -25,7 +25,8 @@
       "expo-status-bar",
       "expo-camera",
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      "expo-asset"
     ]
   }
 }

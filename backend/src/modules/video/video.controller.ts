@@ -14,6 +14,8 @@ export async function createVideoUpload(
   try {
     const { userId } = req.auth;
 
+    if (!userId) throw new Error("missing userId");
+
     const { fileName, contentType, fileSize } = req.body;
 
     const result = await videoService.createUpload(userId, {

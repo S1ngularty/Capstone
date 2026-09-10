@@ -18,6 +18,7 @@ export class AuthMiddleware {
       });
     }
 
+    req.auth = auth;
     // Continue to the route handler if authenticated
     next();
   }
