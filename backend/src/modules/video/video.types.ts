@@ -21,6 +21,7 @@ export interface Video {
   contentType: string;
   fileSize: number;
   status: VideoStatus;
+  idempotencyKey: string;
   processedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +51,7 @@ export interface ICreateVideo {
   originalFileName: string;
   contentType: string;
   fileSize: number;
+  idempotencyKey: string;
   status?: VideoStatus;
   processedAt?: Date | null;
 }
@@ -106,13 +108,3 @@ export interface IVideoOwnershipCheck {
   userId: string;
 }
 
-// ==========================================
-// RESPONSE DTOs
-// ==========================================
-
-export interface IPresignedUploadResponse {
-  videoId: string;
-  storageKey: string;
-  uploadUrl: string;
-  expiresIn: number;
-}

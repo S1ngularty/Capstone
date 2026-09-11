@@ -7,6 +7,7 @@ import type {
   IVideoListOptions,
   IVideoProjection,
   UpdateVideoStatusInput,
+  Video,
   VideoStatus,
 } from "./video.types.js";
 import type { QueryFilter, SortOrder } from "mongoose";
@@ -37,6 +38,13 @@ class VideoRepository {
 
   async findByStorageKey(storageKey: string): Promise<VideoDocument | null> {
     return VideoModel.findOne({ storageKey }).exec();
+  }
+
+  async findByIdempotencyKey(key: string): Promise<VideoDocument | null> {
+    const videoDoc = await VideoModel.findOne({ idempotencyKey: key });
+    if (videoDoc) return videoDoc;
+
+    return null;
   }
 
   async findByUser(userId: string): Promise<VideoDocument[]> {

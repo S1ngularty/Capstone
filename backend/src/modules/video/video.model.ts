@@ -20,6 +20,10 @@ const videoSchema = new Schema<Video>(
       unique: true,
       trim: true,
     },
+    idempotencyKey: {
+      type: String,
+      required: true,
+    },
     originalFileName: {
       type: String,
       required: true,

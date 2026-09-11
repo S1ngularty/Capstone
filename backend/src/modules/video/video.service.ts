@@ -2,14 +2,13 @@ import { randomUUID } from "node:crypto";
 import { r2Client } from "../../integrations/storage/r2.client.js";
 
 import { videoRepository } from "./video.repository.js";
-import type { CreateVideoInput, Video } from "./video.types.js";
+import type { CreateVideoInput } from "./video.types.js";
 
 import { validateVideoUpload } from "./video.validation.js";
+import type { IPresignedUploadResponse } from "./video.dto.js";
 
 export class VideoService {
-  async createUpload(userId: string, input: CreateVideoInput) {
-    validateVideoUpload(input.contentType, input.fileSize);
-
+  private generateVideoMetadata(userId: string, input: CreateVideoInput) {
     const videoId = randomUUID();
 
     const extension =
@@ -20,8 +19,44 @@ export class VideoService {
           : "mov";
 
     const storageKey = `videos/${userId}/${videoId}/${input.fileName}.${extension}`;
-    const uploadUrl = await r2Client.createUploadUrl(
+
+    return {
+      videoId,
+      extension,
       storageKey,
+    };
+  }
+
+  async createUpload(
+    userId: string,
+    input: CreateVideoInput,
+    idempotencyKey: string,
+  ): Promise<IPresignedUploadResponse> {
+    validateVideoUpload(input.contentType, input.fileSize);
+
+    const idempotentVideoDoc =
+      await videoRepository.findByIdempotencyKey(idempotencyKey);
+
+    if (idempotentVideoDoc) {
+      const vid = idempotentVideoDoc.toObject();
+
+      const newUploadUrl = await r2Client.createUploadUrl(
+        vid.storageKey,
+        vid.contentType,
+      );
+
+      return {
+        videoId: null,
+        storageKey: vid.storageKey,
+        uploadUrl: newUploadUrl,
+        expiresIn: 300,
+      };
+    }
+
+    const metadata = this.generateVideoMetadata(userId, input);
+
+    const uploadUrl = await r2Client.createUploadUrl(
+      metadata.storageKey,
       input.contentType,
     );
 
@@ -29,16 +64,17 @@ export class VideoService {
     //
     await videoRepository.createVideo({
       userId,
-      storageKey,
+      storageKey: metadata.storageKey,
       fileSize: input.fileSize,
-      originalFileName: `${input.fileName}.${extension}`,
+      idempotencyKey: idempotencyKey,
+      originalFileName: `${input.fileName}.${metadata.extension}`,
       contentType: input.contentType,
       status: "pending_upload",
     });
 
     return {
-      videoId,
-      storageKey,
+      videoId: metadata.videoId,
+      storageKey: metadata.storageKey,
       uploadUrl,
       expiresIn: 300,
     };
