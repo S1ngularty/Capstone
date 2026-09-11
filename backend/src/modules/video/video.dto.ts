@@ -1,5 +1,6 @@
-export interface CreateUploadReturn {
-  videoId: string;
+
+export interface IPresignedUploadResponse {
+  videoId: string | null;
   storageKey: string;
   uploadUrl: string;
   expiresIn: number;

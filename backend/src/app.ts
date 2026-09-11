@@ -8,11 +8,13 @@ const app = express();
 app.use(cors());
 
 import router from "./routes/index.route.js";
+import requestLogger from "./middleware/requestLogger.middleware.js";
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(clerkMiddleware());
+app.use(requestLogger);
 
 app.use("/api/v1", router);
 

@@ -11,6 +11,10 @@ import { UserStackParamList } from "../../../navigations/UserNavigation";
 import { useVideoPlayer } from "expo-video";
 import showToast from "../../../helper/toast";
 import { Alert } from "react-native";
+import { videoApi } from "../videoApi";
+import { File } from "expo-file-system";
+import { useAuth } from "@clerk/expo";
+import * as Crypto from "expo-crypto";
 
 type VideoScanningRouteProp = RouteProp<UserStackParamList, "VideoPreview">;
 
@@ -18,6 +22,8 @@ export default function usePreview() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<VideoScanningRouteProp>();
   const videoUri = route.params?.videoUri;
+
+  const { getToken, isLoaded, isSignedIn } = useAuth();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,13 +33,22 @@ export default function usePreview() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const uploadIdRef = useRef<string | null>(null);
+  const idempotencyKeyRef = useRef<string | null>(null);
+
   const buttonScale = useSharedValue(1);
   const playButtonScale = useSharedValue(1);
-  
+
   // Use a ref to track if the player is still valid
   const isPlayerValid = useRef(true);
   // Use a ref to track if component is mounted
   const isMounted = useRef(true);
+
+  useEffect(() => {
+    if (!videoUri) return;
+    uploadIdRef.current = Crypto.randomUUID();
+    idempotencyKeyRef.current = Crypto.randomUUID();
+  }, [videoUri]);
 
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
@@ -59,7 +74,7 @@ export default function usePreview() {
 
     const subscription = player.addListener("statusChange", (event) => {
       if (!isMounted.current) return;
-      
+
       if (event.status === "readyToPlay") {
         setIsLoading(false);
         setVideoDuration(player.duration);
@@ -71,7 +86,7 @@ export default function usePreview() {
 
     const timeUpdateSubscription = player.addListener("timeUpdate", (event) => {
       if (!isMounted.current) return;
-      
+
       setCurrentPosition(event.currentTime);
 
       // Check if video has ended
@@ -92,7 +107,7 @@ export default function usePreview() {
     return () => {
       isMounted.current = false;
       isPlayerValid.current = false;
-      
+
       // Don't try to pause the player directly - let expo-video handle cleanup
       // The player will be released automatically when the component unmounts
     };
@@ -139,7 +154,7 @@ export default function usePreview() {
 
   const handleAnalyze = async () => {
     if (!isMounted.current) return;
-    
+
     setIsAnalyzing(true);
     buttonScale.value = withTiming(0.95, { duration: 100 });
 
@@ -154,22 +169,88 @@ export default function usePreview() {
     }
 
     // Simulate analysis
-    setTimeout(() => {
+    setTimeout(async () => {
       if (!isMounted.current) return;
-      
+
       setIsAnalyzing(false);
       buttonScale.value = withTiming(1, { duration: 100 });
-      Alert.alert(
-        "Analysis Started",
-        "Your plant video is being analyzed for diseases.",
-        [
-          {
-            text: "OK",
-            // onPress: () => navigation.navigate("AnalysisResults"),
-          },
-        ],
+
+      await handlePresignUpload();
+    }, 1000);
+  };
+
+  const handlePresignUpload = async () => {
+    try {
+      if (!isSignedIn) {
+        throw new Error("Clerk session is not active");
+      }
+
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error("Failed to get Clerk token");
+      }
+
+      const capturedVideo = new File(videoUri);
+
+      const fileSize = capturedVideo.exists ? capturedVideo.size : 0;
+
+      const fileName = `video_${uploadIdRef.current}`;
+      const fileExtension = fileName.split(".").pop()?.toLowerCase();
+      const contentType =
+        fileExtension === "mov" ? "video/quicktime" : "video/mp4";
+
+      const idempotencyKey = idempotencyKeyRef.current;
+
+      // console.log({ fileName, contentType, fileSize }, token);
+      if (!idempotencyKey) {
+        throw new Error("Missing idempotency key");
+      }
+
+      const upload = await videoApi.requestVideoUpload(
+        {
+          fileName,
+          fileSize,
+          contentType,
+        },
+        token,
+        idempotencyKey,
       );
-    }, 2000);
+
+      console.log("presign upload response", upload);
+
+      const uploaded = await handleObjectStorageUpload(upload.uploadUrl);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleObjectStorageUpload = async (presignedUrl: string) => {
+    if (!videoUri) {
+      throw new Error("Missing video URI");
+    }
+
+    const videoFile = new File(videoUri);
+
+    if (!videoFile.exists) {
+      throw new Error(`Video file does not exist: ${videoUri}`);
+    }
+
+    if (!presignedUrl) throw new Error("missing presigned url");
+
+    // console.log("Uploading local file:", {
+    //   uri: videoFile.uri,
+    //   size: videoFile.size,
+    // });
+
+    const uploadResponse = await videoApi.videoUploadObjectStorage(
+      presignedUrl,
+      videoFile,
+    );
+
+    console.log("Upload response:", uploadResponse);
+
+    return uploadResponse;
   };
 
   const handleRecapture = () => {
@@ -198,7 +279,7 @@ export default function usePreview() {
 
   const handleSaveDraft = async () => {
     if (!isMounted.current) return;
-    
+
     setIsSaving(true);
     buttonScale.value = withTiming(0.95, { duration: 100 });
 
@@ -214,7 +295,7 @@ export default function usePreview() {
     // Simulate saving
     setTimeout(() => {
       if (!isMounted.current) return;
-      
+
       setIsSaving(false);
       buttonScale.value = withTiming(1, { duration: 100 });
       showToast(

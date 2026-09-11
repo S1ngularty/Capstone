@@ -38,13 +38,13 @@ export default function SignInHook() {
         emailAddress: credentials.email,
         password: credentials.password,
       });
-
+      console.log(signIn.status);
+      
       if (error) throw error;
 
-      console.log(signIn.status);
-
       if (signIn.status === "complete") {
-        navigation.navigate("Home" as never);
+        await signIn.finalize();
+        // navigation.navigate("Home" as never);
       }
 
       return;
