@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { r2Client } from "../../integrations/storage/r2.client.js";
 
+import { videoRepository } from "./video.repository.js";
 import type { CreateVideoInput, Video } from "./video.types.js";
 
 import { validateVideoUpload } from "./video.validation.js";
@@ -26,13 +27,14 @@ export class VideoService {
 
     // Save metadata to DB here.
     //
-    // await videoRepository.create({
-    //   id: videoId,
-    //   userId,
-    //   storageKey,
-    //   contentType: input.contentType,
-    //   status: "pending_upload",
-    // });
+    await videoRepository.createVideo({
+      userId,
+      storageKey,
+      fileSize: input.fileSize,
+      originalFileName: `${input.fileName}.${extension}`,
+      contentType: input.contentType,
+      status: "pending_upload",
+    });
 
     return {
       videoId,

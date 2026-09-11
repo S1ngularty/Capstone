@@ -14,6 +14,7 @@ import { Alert } from "react-native";
 import { videoApi } from "../videoApi";
 import { File } from "expo-file-system";
 import { useAuth } from "@clerk/expo";
+import * as Crypto from "expo-crypto";
 
 type VideoScanningRouteProp = RouteProp<UserStackParamList, "VideoPreview">;
 
@@ -32,6 +33,9 @@ export default function usePreview() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const uploadIdRef = useRef<string | null>(null);
+  const idempotencyKeyRef = useRef<string | null>(null);
+
   const buttonScale = useSharedValue(1);
   const playButtonScale = useSharedValue(1);
 
@@ -39,6 +43,12 @@ export default function usePreview() {
   const isPlayerValid = useRef(true);
   // Use a ref to track if component is mounted
   const isMounted = useRef(true);
+
+  useEffect(() => {
+    if (!videoUri) return;
+    uploadIdRef.current = Crypto.randomUUID();
+    idempotencyKeyRef.current = Crypto.randomUUID();
+  }, [videoUri]);
 
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
@@ -145,7 +155,7 @@ export default function usePreview() {
   const handleAnalyze = async () => {
     if (!isMounted.current) return;
 
-    const token = setIsAnalyzing(true);
+    setIsAnalyzing(true);
     buttonScale.value = withTiming(0.95, { duration: 100 });
 
     // Pause video if playing
@@ -185,12 +195,17 @@ export default function usePreview() {
 
       const fileSize = capturedVideo.exists ? capturedVideo.size : 0;
 
-      const fileName = `video_${Date.now()}`;
+      const fileName = `video_${uploadIdRef.current}`;
       const fileExtension = fileName.split(".").pop()?.toLowerCase();
       const contentType =
         fileExtension === "mov" ? "video/quicktime" : "video/mp4";
 
+      const idempotencyKey = idempotencyKeyRef.current;
+
       // console.log({ fileName, contentType, fileSize }, token);
+      if (!idempotencyKey) {
+        throw new Error("Missing idempotency key");
+      }
 
       const respose = await videoApi.requestVideoUpload(
         {
@@ -199,6 +214,7 @@ export default function usePreview() {
           contentType,
         },
         token,
+        idempotencyKey,
       );
 
       // console.log(respose);

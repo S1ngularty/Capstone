@@ -15,11 +15,13 @@ class API {
     path: string,
     options: RequestInit = {},
     token: string | null,
+    idempotencyKey: string | null,
   ): Promise<T> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
         ...(token
           ? {
               Authorization: `Bearer ${token}`,
