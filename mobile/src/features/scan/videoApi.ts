@@ -1,3 +1,4 @@
+import FileSystem from "expo-file-system";
 import { client } from "../../api/apiClient";
 
 import type {
@@ -11,15 +12,31 @@ class VideoAPI {
     token: string,
     idempotencyKey: string,
   ): Promise<CreateVideoUploadResponse> {
-    return client.request(
+    const response = await client.request<CreateVideoUploadResponse>(
       "/api/v1/videos/upload",
       {
         method: "POST",
         body: JSON.stringify(input),
       },
-      token,
-      idempotencyKey,
+      { token, idempotencyKey },
     );
+
+    return response.result;
+  }
+
+  async videoUploadObjectStorage(
+    presignedUrl: string,
+    file: FileSystem.File,
+  ): Promise<void> {
+    const data: Uint8Array = await file.bytes();
+
+    const response = await fetch(presignedUrl, {
+      method: "PUT",
+      body: data as BufferSource,
+      headers: {
+        "Content-Type": file.type,
+      },
+    });
   }
 
   async completeVideoUpload(
@@ -32,8 +49,7 @@ class VideoAPI {
       {
         method: "POST",
       },
-      token,
-      idempotencyKey,
+      { token, idempotencyKey },
     );
   }
 }

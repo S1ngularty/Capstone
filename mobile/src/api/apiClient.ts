@@ -1,3 +1,5 @@
+import { WrapServerResponse } from "../types/api";
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!API_URL) {
@@ -14,13 +16,20 @@ class API {
   async request<T>(
     path: string,
     options: RequestInit = {},
-    token: string | null,
-    idempotencyKey: string | null,
-  ): Promise<T> {
+    {
+      token,
+      idempotencyKey,
+      contentType = "application/json",
+    }: {
+      token?: string | null;
+      idempotencyKey?: string | null;
+      contentType?: string;
+    } = {},
+  ): Promise<WrapServerResponse<T>> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       ...options,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": contentType,
         ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
         ...(token
           ? {
@@ -38,7 +47,7 @@ class API {
       );
     }
 
-    return response.json() as Promise<T>;
+    return response.json();
   }
 }
 

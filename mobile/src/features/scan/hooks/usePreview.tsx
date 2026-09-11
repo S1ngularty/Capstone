@@ -175,11 +175,11 @@ export default function usePreview() {
       setIsAnalyzing(false);
       buttonScale.value = withTiming(1, { duration: 100 });
 
-      await handleUpload();
+      await handlePresignUpload();
     }, 1000);
   };
 
-  const handleUpload = async () => {
+  const handlePresignUpload = async () => {
     try {
       if (!isSignedIn) {
         throw new Error("Clerk session is not active");
@@ -207,7 +207,7 @@ export default function usePreview() {
         throw new Error("Missing idempotency key");
       }
 
-      const respose = await videoApi.requestVideoUpload(
+      const upload = await videoApi.requestVideoUpload(
         {
           fileName,
           fileSize,
@@ -217,10 +217,40 @@ export default function usePreview() {
         idempotencyKey,
       );
 
-      // console.log(respose);
+      console.log("presign upload response", upload);
+
+      const uploaded = await handleObjectStorageUpload(upload.uploadUrl);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleObjectStorageUpload = async (presignedUrl: string) => {
+    if (!videoUri) {
+      throw new Error("Missing video URI");
+    }
+
+    const videoFile = new File(videoUri);
+
+    if (!videoFile.exists) {
+      throw new Error(`Video file does not exist: ${videoUri}`);
+    }
+
+    if (!presignedUrl) throw new Error("missing presigned url");
+
+    // console.log("Uploading local file:", {
+    //   uri: videoFile.uri,
+    //   size: videoFile.size,
+    // });
+
+    const uploadResponse = await videoApi.videoUploadObjectStorage(
+      presignedUrl,
+      videoFile,
+    );
+
+    console.log("Upload response:", uploadResponse);
+
+    return uploadResponse;
   };
 
   const handleRecapture = () => {
