@@ -53,3 +53,8 @@ https://huggingface.co/datasets/lorenzoxi/tomato-leaves-dataset (
 
 	https://www.kaggle.com/datasets/enalis/tomatoes-dataset (general classes)
 	https://github.com/up2metric/tomatOD (unripe-1592	semi-ripe-395	fully-ripe-431)
+	https://www.kaggle.com/datasets/arjunsudheer326/tomato-plant-stages-dataset (good for crop identification)
+
+
+	Chili:
+	https://www.kaggle.com/datasets/ravindubandara3002/chilli-plant-diseases-dataset(support most of the classes )
